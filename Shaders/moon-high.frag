@@ -11,7 +11,7 @@ uniform sampler2D texture;
 uniform sampler2D normal_texture;
 
 //highest range 18km
-//radius 1737
+//radius 1737km
 uniform float relief_vscale = 0.01;
 
 //vertical sampling
@@ -40,7 +40,8 @@ vec2 parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
   float weight=0.0;
 
-  float nsteps = nbase/max(0.2,viewDir.z);
+  // sampling boost when grazing  
+  float nsteps = nbase/max(0.3,viewDir.z);
   float stepsize = relief_vscale/nbase;
   
   mover = vec3(texCoords,0.0);
@@ -83,7 +84,7 @@ void main()
   vec3 V;
   vec3 n;
   float cL;
-  //float NdotL, NdotE;
+  //  float NdotL, NdotE;
   float ndotL, ndotE, EdotL;
   vec4 color = gl_Color;
 
@@ -112,26 +113,28 @@ void main()
 
   n = normalize(2.0 * normal_texel.rgb - 1.0);
 
-  //issue here with the normalmap B -> -B ???
-  n = normalize(n.x * T - n.y * B + n.z * N);
+  //mind potential issues here with the normalmap ny -> -ny etc...
+  n = normalize(n.x * T + n.y * B + n.z * N);
 
-  //washes the zebra on flats
-  //NdotL = clamp( dot(N, lightDir), 0.0, 1.0);
-  //NdotE = clamp( dot(N, EmDir), 0.0, 1.0);
+  //washes a bit the zebra on flats
+  // NdotL = clamp( dot(N, lightDir), 0.0, 1.0);
   // ndotL = clamp( dot(n, lightDir), NdotL, 1.0);
-  // ndotE = clamp( dot(n, EmDir), NdotE, 1.0);
+
   
   ndotL = clamp( dot(n, lightDir), 0.0, 1.0);
-  ndotE = clamp( dot(n, EmDir), 0.0, 1.0);
   
   if (ndotL > 0.0)
     {
 
-    EdotL = dot(EmDir,lightDir);
-    // arXiv:1701.0855
+      // NdotE = clamp( dot(N, EmDir), 0.0, 1.0);
+      // ndotE = clamp( dot(n, EmDir), NdotE, 1.0);
+      
+      ndotE = clamp( dot(n, EmDir), 0.0, 1.0);
+      EdotL = dot(EmDir,lightDir);
+      // arXiv:1701.0855
 
-    cL = 0.9 - 0.01*acos(EdotL);
-    color += ndotL *(2.0*cL/(ndotL + ndotE) + 1.0-cL);
+      cL = 0.9 - 0.01*acos(EdotL);
+      color += ndotL *(2.0*cL/(ndotL + ndotE) + 1.0-cL);
 
     }
       
