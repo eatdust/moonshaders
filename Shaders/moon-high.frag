@@ -12,10 +12,11 @@ uniform sampler2D normal_texture;
 
 //highest range 18km
 //radius 1737km
-uniform float relief_vscale = 0.01;
+const float relief_vscale = 0.01;
 
 //vertical sampling
-uniform float nbase = 30.0;
+const float nbase = 30.0;
+const float nhuge = 100.0;
 
 
 vec3 filter_combined (in vec3 color) ;
@@ -26,6 +27,7 @@ vec2 parallax_constant_mapping(vec2 texCoords, vec3 viewDir)
   float height = 0.5 - texture2D(normal_texture, texCoords).a;    
   return viewDir.st * (height * relief_vscale) + texCoords;
 }
+
 
 
 
@@ -40,13 +42,13 @@ vec2 parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
   float weight=0.0;
 
-  // sampling boost when grazing  
-  float nsteps = nbase/max(0.3,viewDir.z);
+  float nsteps = min(nbase/max(0.0,viewDir.z),nhuge);
   float stepsize = relief_vscale/nbase;
   
   mover = vec3(texCoords,0.0);
   
   height = relief_vscale * (0.5 - texture2D(normal_texture, mover.xy).a);
+  
   
   sdir = sign(height);
   dview = sdir * viewDir * stepsize;
@@ -69,12 +71,10 @@ vec2 parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
       
     }
-
+  
   return mover.st - dview.st*weight;
   
 }
-
-
 
 
 
@@ -105,7 +105,7 @@ void main()
   vec2 texCoord = gl_TexCoord[0].st;
 
   texCoord = parallax_interstep_mapping(texCoord,V);
-
+  
   texel = texture2D(texture, texCoord.st);
   texel.a = 1.0;
   

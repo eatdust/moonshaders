@@ -21,14 +21,15 @@ uniform sampler2D grain_texture;
 uniform sampler2D normal_texture;
 
 
-const float relief_vscale = 0.001;
+const float relief_vscale = 0.0014;
 const float nbase = 30.0;
-
+const float nhuge = 100.0;
 
 
 float Noise2D(in vec2 coord, in float wavelength);
 vec3 filter_combined (in vec3 color) ;
 vec3 moonlight_perception (in vec3 light);
+
 
 
 
@@ -43,12 +44,13 @@ vec2 parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
   float weight=0.0;
 
-  float nsteps = nbase/max(0.3,viewDir.z);
+  float nsteps = min(nbase/max(0.0,viewDir.z),nhuge);
   float stepsize = relief_vscale/nbase;
   
   mover = vec3(texCoords,0.0);
   
   height = relief_vscale * (1.0 - texture2D(normal_texture, mover.xy).a);
+  
   
   sdir = sign(height);
   dview = sdir * viewDir * stepsize;
@@ -71,7 +73,7 @@ vec2 parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
       
     }
-
+  
   return mover.st - dview.st*weight;
   
 }
