@@ -22,8 +22,8 @@ uniform sampler2D normal_texture;
 
 
 const float relief_vscale = 0.0014;
-const float nbase = 30.0;
-const float nhuge = 100.0;
+const float nbase = 10.0;
+const float nhuge = 30.0;
 
 
 float Noise2D(in vec2 coord, in float wavelength);
@@ -44,7 +44,7 @@ vec2 parallax_interstep_mapping(vec2 texCoords, vec3 viewDir)
 
   float weight=0.0;
 
-  float nsteps = min(nbase/max(0.0,viewDir.z),nhuge);
+  float nsteps = min(nbase/max(0.001,viewDir.z),nhuge);
   float stepsize = relief_vscale/nbase;
   
   mover = vec3(texCoords,0.0);
@@ -125,7 +125,7 @@ void main()
     {
       float xOffset = -5.0*relief_vscale * dot(lightDir, T);
       float yOffset = -5.0*relief_vscale * dot(lightDir, B);
-      shadowTexel = texture2D(shadowtex, vec2(texCoord.s-xOffset, texCoord.t-yOffset));
+      shadowTexel = texture2D(shadowtex, vec2(gl_TexCoord[0].s-xOffset, gl_TexCoord[0].t-yOffset));
     }
   else
     {
@@ -135,11 +135,11 @@ void main()
   texel = texture2D(texture, texCoord.st);
   float night_light = (1.0 -texel.a);
   texel.a = 1.0;
-  grainTexel = texture2D(grain_texture, texCoord.st * 40.0);
+  grainTexel = texture2D(grain_texture, gl_TexCoord[0].st * 40.0);
 
-  float noise = Noise2D( texCoord.st, 0.00005);
-  noise += Noise2D( texCoord.st, 0.0002);
-  noise += Noise2D( texCoord.st, 0.0001);
+  float noise = Noise2D( gl_TexCoord[0].st, 0.00005);
+  noise += Noise2D( gl_TexCoord[0].st, 0.0002);
+  noise += Noise2D( gl_TexCoord[0].st, 0.0001);
 	
   noise= noise/3.0;
 
