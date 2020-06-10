@@ -30,7 +30,7 @@ void main()
    
   NdotL = dot(N, lightDir);
 
-  if (NdotL > 0.0) {
+  if (NdotL >= 0.0) {
 
     NdotE = dot(N, EmDir);
     EdotL = dot(EmDir,lightDir);

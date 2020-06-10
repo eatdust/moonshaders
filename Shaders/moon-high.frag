@@ -123,7 +123,7 @@ void main()
   
   ndotL = clamp( dot(n, lightDir), 0.0, 1.0);
   
-  if (ndotL > 0.0)
+  if (ndotL >= 0.0)
     {
 
       // NdotE = clamp( dot(N, EmDir), 0.0, 1.0);
