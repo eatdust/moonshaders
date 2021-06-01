@@ -131,7 +131,7 @@ void main()
       
       ndotE = clamp( dot(n, EmDir), 0.0, 1.0);
       EdotL = dot(EmDir,lightDir);
-      // arXiv:1701.0855
+      // arXiv:1701.08550
 
       cL = 0.9 - 0.01*acos(EdotL);
       color += ndotL *(2.0*cL/(ndotL + ndotE) + 1.0-cL);

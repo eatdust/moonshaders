@@ -34,7 +34,7 @@ void main()
 
     NdotE = dot(N, EmDir);
     EdotL = dot(EmDir,lightDir);
-    // arXiv:1701.0855
+    // arXiv:1701.08550
     cL = 0.9 - 0.01*acos(EdotL);
     color += NdotL * (2.0*cL/(NdotL+NdotE) + 1.0-cL);
     
